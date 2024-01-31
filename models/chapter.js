@@ -16,11 +16,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "chapterId",
       });
     }
+
+    static addChapter({ title, courseId }) {
+      return this.create({ title, courseId });
+    }
   }
   Chapter.init(
     {
       title: DataTypes.STRING,
-      allowNull: false,
     },
     {
       sequelize,
