@@ -13,6 +13,9 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
+    static getCourses() {
+      return this.findAll();
+    }
     static addCourse({ title }) {
       return this.create({ title });
     }
