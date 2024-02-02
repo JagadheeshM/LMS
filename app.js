@@ -52,6 +52,15 @@ app.post("/courses/:id/chapters", async (request, response) => {
   }
 });
 
+app.get("/courses/:id/chapters", async (request, response) => {
+  try {
+    const chapters = await Chapter.getChapters(request.params.id);
+    response.json(chapters);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 app.post("/courses/:id/chapters/:chid/pages", async (request, response) => {
   console.log(request.body);
   try {
@@ -63,6 +72,15 @@ app.post("/courses/:id/chapters/:chid/pages", async (request, response) => {
   } catch (err) {
     console.log(err);
     return response.status(422).json(err);
+  }
+});
+
+app.get("/courses/chapters/:id/pages", async (request, response) => {
+  try {
+    const pages = await Page.getPages(request.params.id);
+    response.json(pages);
+  } catch (err) {
+    console.log(err);
   }
 });
 

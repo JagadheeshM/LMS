@@ -4,15 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="./css/styles.css">
 </head>
 <body>
     <%- include('header.ejs') %>
-    <ul>
-        <% for(var i=0; i < courses.length; i++){ %>
-            <li><%= courses[i].title %></li>    
-        <%}%>
-    </ul>
+   
+    <div class="bg-white py-24 sm:py-1 mx-8">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+              <% for(var i=0; i < courses.length; i++){ %>
+            <article class="flex max-w-xl flex-col items-start justify-between">    
+              <div class="group relative">
+                <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
+                  <a href="#">
+                    <span class="absolute inset-0"></span>
+                    <p><%= courses[i].title %></p>
+                  </a>
+                </h3>
+              </div>
+              <div class="relative mt-8 flex items-center gap-x-4">
+                <div class="text-sm leading-6">
+                  <p class="font-semibold text-gray-900">
+                    <a href="#">
+                      <span class="absolute inset-0"></span>
+                      Michael Foster
+                    </a>
+                  </p>
+                  <p class="text-gray-600">Co-Founder / CTO</p>
+                </div>
+              </div>
+            </article>
+            <%}%>
+          </div>
+        </div>
+      </div>
+
     <%- include('footer.ejs') %>
 </body>
 </html>

@@ -20,6 +20,14 @@ module.exports = (sequelize, DataTypes) => {
     static addChapter({ title, courseId }) {
       return this.create({ title, courseId });
     }
+
+    static getChapters(id) {
+      return this.findAll({
+        where: {
+          courseId: id,
+        },
+      });
+    }
   }
   Chapter.init(
     {

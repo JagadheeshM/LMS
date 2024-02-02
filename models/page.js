@@ -16,6 +16,14 @@ module.exports = (sequelize, DataTypes) => {
     static addPage({ content, chapterId }) {
       return this.create({ content, chapterId });
     }
+
+    static getPages(id) {
+      return this.findAll({
+        where: {
+          chapterId: id,
+        },
+      });
+    }
   }
   Page.init(
     {
