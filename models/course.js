@@ -6,6 +6,10 @@ module.exports = (sequelize, DataTypes) => {
       Course.hasMany(models.Chapter, {
         foreignKey: "courseId",
       });
+
+      Course.belongsTo(models.User, {
+        foreignKey: "userId",
+      });
     }
 
     static getCourses() {

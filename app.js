@@ -8,10 +8,10 @@ app.use(bodyParser.json());
 //set EJS as view engine
 
 app.set("view engine", "ejs");
-
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
-const { Course, Chapter, Page } = require("./models");
+const { Course, Chapter, Page, User } = require("./models");
 
 app.get("/", async (resquest, response) => {
   const courses = await Course.getCourses();
@@ -87,6 +87,25 @@ app.get("/courses/chapters/:id/pages", async (request, response) => {
 app.put("/courses/:id/markAsComplete", (request, resposne) => {
   console.log(`course ${request.params.id} marked as complete`);
   response.send(`course ${request.params.id} marked as complete`);
+});
+
+app.get("/signup", (request, response) => {
+  response.render("signup");
+});
+
+app.get("/login", (request, response) => {
+  response.render("login");
+});
+
+app.post("/users", async (request, response) => {
+  const user = await User.create({
+    firstName: request.body.firstName,
+    lastName: request.body.lastName,
+    email: request.body.email,
+    password: request.body.password,
+    type: request.body.type,
+  });
+  response.json(user);
 });
 
 module.exports = app;
