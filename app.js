@@ -31,7 +31,7 @@ app.post("/courses", async (request, response) => {
   console.log(request.body);
   try {
     const course = await Course.addCourse({ title: request.body.title });
-    return response.json(course);
+    return response.redirect(`/courses/${course.id}/chapters`);
   } catch (err) {
     console.log(err);
     return response.status(422).json(err);
@@ -45,7 +45,7 @@ app.post("/courses/:id/chapters", async (request, response) => {
       title: request.body.title,
       courseId: request.params.id,
     });
-    return response.json(chapter);
+    return response.redirect(`/courses/chapters/${chapter.id}/pages`);
   } catch (err) {
     console.log(err);
     return response.status(422).json(err);
@@ -55,38 +55,59 @@ app.post("/courses/:id/chapters", async (request, response) => {
 app.get("/courses/:id/chapters", async (request, response) => {
   try {
     const chapters = await Chapter.getChapters(request.params.id);
-    response.json(chapters);
+    return response.render("chapters", { chapters, id: request.params.id });
   } catch (err) {
     console.log(err);
   }
 });
 
-app.post("/courses/:id/chapters/:chid/pages", async (request, response) => {
-  console.log(request.body);
+app.get("/courses/:id/addCourse", (request, response) => {
+  response.render("addChapter", { id: request.params.id });
+});
+
+app.post("/courses/chapters/:chid/pages", async (request, response) => {
   try {
     const page = await Page.addPage({
       content: request.body.content,
       chapterId: request.params.chid,
     });
-    return response.json(page);
+    return response.redirect(`/courses/chapters/pages/${page.id}`);
   } catch (err) {
     console.log(err);
     return response.status(422).json(err);
   }
 });
 
+app.get("/courses/chapters/pages/:id", async (request, response) => {
+  const page = await Page.findByPk(request.params.id);
+  response.render("page", { page });
+});
+
 app.get("/courses/chapters/:id/pages", async (request, response) => {
   try {
     const pages = await Page.getPages(request.params.id);
-    response.json(pages);
+    response.render("pages", { pages });
   } catch (err) {
     console.log(err);
   }
 });
 
-app.put("/courses/:id/markAsComplete", (request, resposne) => {
-  console.log(`course ${request.params.id} marked as complete`);
-  response.send(`course ${request.params.id} marked as complete`);
+app.get("/courses/chapters/:id/addPage", (request, response) => {
+  response.render("addPage", { id: request.params.id });
+});
+
+app.put("/courses/:id/markAsComplete", async (request, resposne) => {
+  try {
+    const page = await Page.findByPk(request.params.id);
+    await page.markAsCompleted({ completed: true });
+    resposne.render("page", { page });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+app.get("/addCourse", (request, response) => {
+  response.render("addCourse");
 });
 
 app.get("/signup", (request, response) => {

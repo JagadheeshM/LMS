@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <%- include('header.ejs') %>
+    <h2>Pages</h2>
+    <% if(pages.length==0){%>
+    <p>There are no pages available. Create One?</p>
+    <%} else{ %>
+    <ul>
+        <% for(var i=0;i< pages.length;i++){ %>
+            <li><%- pages[i].title %></li>    
+        <%}%>
+    </ul>
+    <% } %>
+    <a href="addPage">Create a new page</a>
+</body>
+</html>

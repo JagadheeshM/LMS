@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapters</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <%- include('header.ejs') %>
+    <h2>New Page</h2>
+    <form action="pages" method="post">
+        <label for="content">Content</label>
+        <textarea id="content" name="content" class="wmd-input s-input bar0 js-post-body-field processed" data-editor-type="wmd" data-post-type-id="2" cols="92" rows="15" aria-labelledby="your-answer-header" tabindex="101" data-min-length=""></textarea>
+        
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

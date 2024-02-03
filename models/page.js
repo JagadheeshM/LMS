@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     static addPage({ content, chapterId }) {
-      return this.create({ content, chapterId });
+      return this.create({ content, chapterId, completed: false });
     }
 
     static getPages(id) {
@@ -24,10 +24,15 @@ module.exports = (sequelize, DataTypes) => {
         },
       });
     }
+
+    async markAsCompleted(id) {
+      await this.update({ completed: true });
+    }
   }
   Page.init(
     {
       content: DataTypes.TEXT,
+      completed: DataTypes.BOOLEAN,
     },
     {
       sequelize,

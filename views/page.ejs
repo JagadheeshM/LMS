@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        async function markAsComplete(id){
+            console.log("function called",id)
+            fetch(`/courses/${id}/markAsComplete`,{
+                method:"put",
+                headers:{"Content-type":"application/json"}
+            })
+            .then((res)=>{
+                if(res.ok){
+                    window.location.reload();
+                }
+            })
+            .catch((err)=>console.error(err));
+        }
+    </script>
+</head>
+<body>
+    <p><%= page.content %></p>
+    <button onclick="markAsComplete(<%=page.id%>)">
+        <%if(page.completed){ %>
+        <p>marked as completed</p>
+        <%}else{%>
+            <p>mark as complete</p> 
+        <%}%>
+        </button>
+</body>
+</html>
