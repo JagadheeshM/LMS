@@ -122,77 +122,113 @@ app.post(
   },
 );
 
-app.post("/courses/:id/chapters", async (request, response) => {
-  console.log(request.body);
-  try {
-    const chapter = await Chapter.addChapter({
-      title: request.body.title,
-      courseId: request.params.id,
-    });
-    return response.redirect(`/courses/chapters/${chapter.id}/pages`);
-  } catch (err) {
-    console.log(err);
-    return response.status(422).json(err);
-  }
-});
+app.post(
+  "/courses/:id/chapters",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    console.log(request.body);
+    try {
+      const chapter = await Chapter.addChapter({
+        title: request.body.title,
+        courseId: request.params.id,
+      });
+      return response.redirect(`/courses/chapters/${chapter.id}/pages`);
+    } catch (err) {
+      console.log(err);
+      return response.status(422).json(err);
+    }
+  },
+);
 
-app.get("/courses/:id/chapters", async (request, response) => {
-  try {
-    const chapters = await Chapter.getChapters(request.params.id);
-    return response.render("chapters", { chapters, id: request.params.id });
-  } catch (err) {
-    console.log(err);
-  }
-});
+app.get(
+  "/courses/:id/chapters",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      const chapters = await Chapter.getChapters(request.params.id);
+      return response.render("chapters", { chapters, id: request.params.id });
+    } catch (err) {
+      console.log(err);
+    }
+  },
+);
 
-app.get("/courses/:id/addCourse", (request, response) => {
-  response.render("addChapter", { id: request.params.id });
-});
+app.get(
+  "/courses/:id/addCourse",
+  connectEnsureLogin.ensureLoggedIn(),
+  (request, response) => {
+    response.render("addChapter", { id: request.params.id });
+  },
+);
 
-app.post("/courses/chapters/:chid/pages", async (request, response) => {
-  try {
-    const page = await Page.addPage({
-      content: request.body.content,
-      chapterId: request.params.chid,
-    });
-    return response.redirect(`/courses/chapters/pages/${page.id}`);
-  } catch (err) {
-    console.log(err);
-    return response.status(422).json(err);
-  }
-});
+app.post(
+  "/courses/chapters/:chid/pages",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      const page = await Page.addPage({
+        content: request.body.content,
+        chapterId: request.params.chid,
+      });
+      return response.redirect(`/courses/chapters/pages/${page.id}`);
+    } catch (err) {
+      console.log(err);
+      return response.status(422).json(err);
+    }
+  },
+);
 
-app.get("/courses/chapters/pages/:id", async (request, response) => {
-  const page = await Page.findByPk(request.params.id);
-  response.render("page", { page });
-});
-
-app.get("/courses/chapters/:id/pages", async (request, response) => {
-  try {
-    const pages = await Page.getPages(request.params.id);
-    response.render("pages", { pages });
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-app.get("/courses/chapters/:id/addPage", (request, response) => {
-  response.render("addPage", { id: request.params.id });
-});
-
-app.put("/courses/:id/markAsComplete", async (request, resposne) => {
-  try {
+app.get(
+  "/courses/chapters/pages/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
     const page = await Page.findByPk(request.params.id);
-    await page.markAsCompleted({ completed: true });
-    resposne.render("page", { page });
-  } catch (err) {
-    console.log(err);
-  }
-});
+    response.render("page", { page });
+  },
+);
 
-app.get("/addCourse", (request, response) => {
-  response.render("addCourse");
-});
+app.get(
+  "/courses/chapters/:id/pages",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      const pages = await Page.getPages(request.params.id);
+      response.render("pages", { pages });
+    } catch (err) {
+      console.log(err);
+    }
+  },
+);
+
+app.get(
+  "/courses/chapters/:id/addPage",
+  connectEnsureLogin.ensureLoggedIn(),
+  (request, response) => {
+    response.render("addPage", { id: request.params.id });
+  },
+);
+
+app.put(
+  "/courses/:id/markAsComplete",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, resposne) => {
+    try {
+      const page = await Page.findByPk(request.params.id);
+      await page.markAsCompleted({ completed: true });
+      resposne.render("page", { page });
+    } catch (err) {
+      console.log(err);
+    }
+  },
+);
+
+app.get(
+  "/addCourse",
+  connectEnsureLogin.ensureLoggedIn(),
+  (request, response) => {
+    response.render("addCourse");
+  },
+);
 
 app.get("/signup", (request, response) => {
   response.render("signup");

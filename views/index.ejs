@@ -16,7 +16,9 @@
         <div class="min-h-28 ">
             <div class="max-w-screen-lg mx-auto py-4">
                 <h2 class="font-bold text-center text-4xl text-slate-700 font-display">
-                    Courses Available
+                    <%if(courses.length==0){%>
+                      No <%}%>
+                      Courses Available
                 </h2>
                 <div class="flex flex-wrap justify-center gap-6 mt-20">
                     <% for(var i=0; i < courses.length; i++){ %>
