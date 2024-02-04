@@ -75,11 +75,25 @@ const { Course, Chapter, Page, User } = require("./models");
 
 app.get(
   "/",
-  connectEnsureLogin.ensureLoggedIn(),
-  async (resquest, response) => {
+  //connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
     const courses = await Course.getCourses();
-    if (resquest.accepts("html")) {
-      response.render("index", { courses });
+    const users = [];
+    for (const course of courses) {
+      let user = (
+        await User.findOne({
+          where: {
+            id: course.userId,
+          },
+          attributes: ["firstName"],
+        })
+      ).firstName;
+      users.push(user);
+    }
+    if (request.accepts("html")) {
+      console.log(courses);
+      // response.json({ courses });
+      response.render("index", { courses, users, user: request.user });
     } else {
       response.json({ courses });
     }
@@ -91,16 +105,22 @@ app.get("/courses", (request, response) => {
   response.send("List of courses");
 });
 
-app.post("/courses", async (request, response) => {
-  console.log(request.body);
-  try {
-    const course = await Course.addCourse({ title: request.body.title });
-    return response.redirect(`/courses/${course.id}/chapters`);
-  } catch (err) {
-    console.log(err);
-    return response.status(422).json(err);
-  }
-});
+app.post(
+  "/courses",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      const course = await Course.addCourse({
+        title: request.body.title,
+        userId: request.user.id,
+      });
+      return response.redirect(`/courses/${course.id}/chapters`);
+    } catch (err) {
+      console.log(err);
+      return response.status(422).json(err);
+    }
+  },
+);
 
 app.post("/courses/:id/chapters", async (request, response) => {
   console.log(request.body);

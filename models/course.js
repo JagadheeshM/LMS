@@ -15,8 +15,8 @@ module.exports = (sequelize, DataTypes) => {
     static getCourses() {
       return this.findAll();
     }
-    static addCourse({ title }) {
-      return this.create({ title });
+    static addCourse({ title, userId }) {
+      return this.create({ title, userId });
     }
   }
   Course.init(

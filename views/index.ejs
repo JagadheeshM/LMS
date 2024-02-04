@@ -9,36 +9,50 @@
 </head>
 <body>
     <%- include('header.ejs') %>
-   
-    <div class="bg-white py-24 sm:py-1 mx-8">
-        <div class="mx-auto max-w-7xl px-6 lg:px-8">
-            <div class="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 border-t border-gray-200 pt-10 sm:mt-16 sm:pt-16 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-              <% for(var i=0; i < courses.length; i++){ %>
-            <article class="flex max-w-xl flex-col items-start justify-between">    
-              <div class="group relative">
-                <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-                  <a href="#">
-                    <span class="absolute inset-0"></span>
-                    <p><%= courses[i].title %></p>
-                  </a>
-                </h3>
-              </div>
-              <div class="relative mt-8 flex items-center gap-x-4">
-                <div class="text-sm leading-6">
-                  <p class="font-semibold text-gray-900">
-                    <a href="#">
-                      <span class="absolute inset-0"></span>
-                      Michael Foster
-                    </a>
-                  </p>
-                  <p class="text-gray-600">Co-Founder / CTO</p>
+    <%if(user){%>
+      <%- include('dashboard.ejs') %>
+    <%}%>
+    <div class="relative flex min-h-screen flex-col justify-center overflow-hidden bg-slate-100 py-4 sm:py-12">
+        <div class="min-h-28 ">
+            <div class="max-w-screen-lg mx-auto py-4">
+                <h2 class="font-bold text-center text-4xl text-slate-700 font-display">
+                    Courses Available
+                </h2>
+                <div class="flex flex-wrap justify-center gap-6 mt-20">
+                    <% for(var i=0; i < courses.length; i++){ %>
+                    <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/4 mb-8">
+                        <div class="bg-white shadow rounded-lg overflow-hidden">
+                            <div class="p-6">
+                                <span class="block text-slate-400 font-semibold text-sm">Author : <%= users[i] %></span>
+                                <h3 class="mt-3 font-bold text-lg pb-4 border-b border-slate-300">
+                                    <a href="https://play.tailwindcss.com/TGny89rOkl?layout=horizontal">
+                                        <%= courses[i].title %>
+                                    </a>
+                                </h3>
+                                <div class="flex mt-4 gap-12
+                                 justify-center items-center">
+                                    <span class="flex gap-1 items-center text-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        </svg>
+                                        <a href="courses/<%= courses[i].id %>/chapters" >View</a>
+                                    </span>
+                                    <span class="flex gap-1 items-center text-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="text-sky-400 w-4 h-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                        </svg>
+                                        <a href="">Enroll</a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% } %>
                 </div>
-              </div>
-            </article>
-            <%}%>
-          </div>
+            </div>
         </div>
-      </div>
+    </div>
 
     <%- include('footer.ejs') %>
 </body>
