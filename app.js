@@ -146,7 +146,11 @@ app.get(
   async (request, response) => {
     try {
       const chapters = await Chapter.getChapters(request.params.id);
-      return response.render("chapters", { chapters, id: request.params.id });
+      return response.render("chapters", {
+        chapters,
+        id: request.params.id,
+        user: request.user,
+      });
     } catch (err) {
       console.log(err);
     }
@@ -157,7 +161,10 @@ app.get(
   "/courses/:id/addCourse",
   connectEnsureLogin.ensureLoggedIn(),
   (request, response) => {
-    response.render("addChapter", { id: request.params.id });
+    response.render("addChapter", {
+      id: request.params.id,
+      user: request.user,
+    });
   },
 );
 
@@ -183,7 +190,7 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const page = await Page.findByPk(request.params.id);
-    response.render("page", { page });
+    response.render("page", { page, user: request.user });
   },
 );
 
@@ -193,7 +200,7 @@ app.get(
   async (request, response) => {
     try {
       const pages = await Page.getPages(request.params.id);
-      response.render("pages", { pages });
+      response.render("pages", { pages, user: request.user });
     } catch (err) {
       console.log(err);
     }
@@ -204,7 +211,7 @@ app.get(
   "/courses/chapters/:id/addPage",
   connectEnsureLogin.ensureLoggedIn(),
   (request, response) => {
-    response.render("addPage", { id: request.params.id });
+    response.render("addPage", { id: request.params.id, user: request.user });
   },
 );
 
@@ -215,7 +222,7 @@ app.put(
     try {
       const page = await Page.findByPk(request.params.id);
       await page.markAsCompleted({ completed: true });
-      resposne.render("page", { page });
+      resposne.render("page", { page, user: request.user });
     } catch (err) {
       console.log(err);
     }
@@ -226,7 +233,7 @@ app.get(
   "/addCourse",
   connectEnsureLogin.ensureLoggedIn(),
   (request, response) => {
-    response.render("addCourse");
+    response.render("addCourse", { user: request.user });
   },
 );
 
