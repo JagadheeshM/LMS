@@ -21,13 +21,20 @@
     </script>
 </head>
 <body>
-    <p><%= page.content %></p>
-    <button onclick="markAsComplete(<%=page.id%>)">
-        <%if(page.completed){ %>
-        <p>marked as completed</p>
-        <%}else{%>
-            <p>mark as complete</p> 
-        <%}%>
+        <%- include('header.ejs') %>
+
+        <div>
+            <p>
+                <%= page.content %>
+            </p>
+        </div>
+
+        <button onclick="markAsComplete(<%=page.id%>)">
+            <%if(completed){ %>
+            <p>marked as completed</p>
+            <%}else{%>
+                <p>mark as complete</p> 
+            <%}%>
         </button>
 </body>
 </html>

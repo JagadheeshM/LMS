@@ -7,6 +7,8 @@ app.use(bodyParser.json());
 
 //authentication purpose
 
+const { Op } = require("sequelize");
+
 const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
@@ -71,7 +73,7 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
-const { Course, Chapter, Page, User } = require("./models");
+const { Course, Chapter, Page, User, Enroll, Complete } = require("./models");
 
 app.get(
   "/",
@@ -91,7 +93,6 @@ app.get(
       users.push(user);
     }
     if (request.accepts("html")) {
-      console.log(courses);
       // response.json({ courses });
       response.render("index", { courses, users, user: request.user });
     } else {
@@ -99,11 +100,6 @@ app.get(
     }
   },
 );
-
-app.get("/courses", (request, response) => {
-  console.log("List of courses");
-  response.send("List of courses");
-});
 
 app.post(
   "/courses",
@@ -132,7 +128,7 @@ app.post(
         title: request.body.title,
         courseId: request.params.id,
       });
-      return response.redirect(`/courses/chapters/${chapter.id}/pages`);
+      return response.redirect(`/courses/${request.params.id}/chapters`);
     } catch (err) {
       console.log(err);
       return response.status(422).json(err);
@@ -146,10 +142,20 @@ app.get(
   async (request, response) => {
     try {
       const chapters = await Chapter.getChapters(request.params.id);
+      const course = await Course.findByPk(request.params.id);
+      const enrolled =
+        (await Enroll.findOne({
+          where: {
+            userId: request.user.id,
+            courseId: request.params.id,
+          },
+        })) != null;
       return response.render("chapters", {
         chapters,
         id: request.params.id,
         user: request.user,
+        course,
+        enrolled: enrolled,
       });
     } catch (err) {
       console.log(err);
@@ -158,7 +164,7 @@ app.get(
 );
 
 app.get(
-  "/courses/:id/addCourse",
+  "/courses/:id/addChapter",
   connectEnsureLogin.ensureLoggedIn(),
   (request, response) => {
     response.render("addChapter", {
@@ -169,7 +175,7 @@ app.get(
 );
 
 app.post(
-  "/courses/chapters/:chid/pages",
+  "/courses/:coId/chapters/:chid/pages",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     try {
@@ -177,7 +183,9 @@ app.post(
         content: request.body.content,
         chapterId: request.params.chid,
       });
-      return response.redirect(`/courses/chapters/pages/${page.id}`);
+      return response.redirect(
+        `/courses/${request.params.coId}/chapters/${request.params.chid}/pages`,
+      );
     } catch (err) {
       console.log(err);
       return response.status(422).json(err);
@@ -185,22 +193,35 @@ app.post(
   },
 );
 
+app.get("/courses/:coId/chapters/:chId/pages/:id", (request, response) => {
+  response.redirect(`/courses/chapters/pages/${request.params.id}`);
+});
+
 app.get(
   "/courses/chapters/pages/:id",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const page = await Page.findByPk(request.params.id);
-    response.render("page", { page, user: request.user });
+    const completed =
+      (await Complete.findOne({
+        where: {
+          userId: request.user.id,
+          pageId: request.params.id,
+        },
+      })) != null;
+    response.render("page", { page, user: request.user, completed });
   },
 );
 
 app.get(
-  "/courses/chapters/:id/pages",
+  "/courses/:coId/chapters/:id/pages",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     try {
       const pages = await Page.getPages(request.params.id);
-      response.render("pages", { pages, user: request.user });
+      const chapter = await Chapter.findByPk(request.params.id);
+      const course = await Course.findByPk(chapter.dataValues.courseId);
+      response.render("pages", { pages, user: request.user, chapter, course });
     } catch (err) {
       console.log(err);
     }
@@ -208,7 +229,7 @@ app.get(
 );
 
 app.get(
-  "/courses/chapters/:id/addPage",
+  "/courses/:coId/chapters/:id/addPage",
   connectEnsureLogin.ensureLoggedIn(),
   (request, response) => {
     response.render("addPage", { id: request.params.id, user: request.user });
@@ -218,13 +239,28 @@ app.get(
 app.put(
   "/courses/:id/markAsComplete",
   connectEnsureLogin.ensureLoggedIn(),
-  async (request, resposne) => {
-    try {
-      const page = await Page.findByPk(request.params.id);
-      await page.markAsCompleted({ completed: true });
-      resposne.render("page", { page, user: request.user });
-    } catch (err) {
-      console.log(err);
+  async (request, response) => {
+    if (
+      await Complete.findOne({
+        where: {
+          userId: request.user.id,
+          pageId: request.params.id,
+        },
+      })
+    ) {
+      response.redirect(`/courses/chapters/${request.params.id}/pages`);
+    } else {
+      try {
+        const page = await Page.findByPk(request.params.id);
+        await page.markAsCompleted({ completed: true });
+        await Complete.create({
+          userId: request.user.id,
+          pageId: request.params.id,
+        });
+        resposne.render("page", { page, user: request.user });
+      } catch (err) {
+        console.log(err);
+      }
     }
   },
 );
@@ -234,6 +270,66 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   (request, response) => {
     response.render("addCourse", { user: request.user });
+  },
+);
+
+app.get(
+  "/myEnrolledCourses/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      const mycourses = await Enroll.findAll({
+        where: {
+          userId: request.user.id,
+        },
+        attributes: ["courseId"],
+      });
+      const mycoursesArray = [];
+      for (const mycourse in mycourses) {
+        mycoursesArray.push(mycourses[mycourse].dataValues.courseId);
+      }
+      const courses = await Course.findAll({
+        where: {
+          id: {
+            [Op.in]: mycoursesArray,
+          },
+        },
+      });
+      response.render("myCourses", { courses, user: request.user });
+    } catch (err) {
+      console.log(err);
+    }
+  },
+);
+
+app.get("/myEnrolledCourses/courses/:id/chapters", (request, response) => {
+  response.redirect(`/courses/${request.params.id}/chapters`);
+});
+
+app.get(
+  "/enroll/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    if (
+      await Enroll.findOne({
+        where: {
+          userId: request.user.id,
+          courseId: request.params.id,
+        },
+      })
+    ) {
+      response.redirect(`/myEnrolledCourses/${request.user.id}`);
+    } else {
+      try {
+        const enroll = await Enroll.create({
+          userId: request.user.id,
+          courseId: request.params.id,
+        });
+        response.json(enroll);
+      } catch (err) {
+        console.log(err);
+      }
+    }
   },
 );
 

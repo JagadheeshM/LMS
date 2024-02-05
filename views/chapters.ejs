@@ -8,16 +8,62 @@
 </head>
 <body>
     <%- include('header.ejs') %>
-    <h2>Chapters</h2>
-    <% if(chapters.length==0){%>
-    <p>There are no chapters available. Create One?</p>
-    <%} else{ %>
-    <ul>
-        <% for(var i=0;i< chapters.length;i++){ %>
-            <li><%- chapters[i].title %></li>    
-        <%}%>
-    </ul>
-    <% } %>
-    <a href="addCourse">Create a new chapter</a>
+    <h2 class="font-bold text-center text-3xl text-slate-700 font-display px-3">
+        Chapters
+    </h2>
+    
+<div class="bg-white p-8 rounded-md w-full">
+	<div class=" flex items-center justify-between pb-6">
+		<div>
+			<h2 class="text-gray-600 font-semibold"><%= course.title %></h2>
+			<span class="text-xs">chapters</span>
+		</div>
+		<div class="flex items-center justify-between">
+				<div class="lg:ml-40 ml-10 space-x-8">
+                    <% if(user.id == course.userId){%>
+					<a href="addChapter" class="bg-indigo-600 px-4 py-2 rounded-md text-white font-semibold tracking-wide cursor-pointer">Create</a>
+                    <% } %>
+                </div>
+			</div>
+		</div>
+		<div>
+			<div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
+				<div class="inline-block min-w-full shadow rounded-lg overflow-hidden">
+                    <% if(chapters.length==0){%>
+                        <h2 class="font-bold text-center text-2xl text-slate-500 font-display p-10">
+                            No Chapters Available..!
+                        </h2>
+                        <%} else{ %>
+                            <ul role="list" class="divide-y divide-gray-100">
+                            <% for(var i=0;i< chapters.length;i++){ %>
+                                <li class="flex justify-between gap-x-6 py-5">
+                                    <div class="flex min-w-0 gap-x-4">
+                                      <div class="min-w-0 flex-auto px-5">
+                                        <p class="text-sm font-semibold leading-6 text-gray-900"><%= chapters[i].title %></p>
+                                        <p class="mt-1 truncate text-xs leading-5 text-gray-500">leslie.alexander@example.com</p>
+                                      </div>
+                                    </div>
+                                    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end px-5">
+                                      <% if(enrolled){ %>
+                                      <a href="chapters/<%=chapters[i].id%>/pages" class="text-sm leading-6 text-gray-900"><span><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+                                      </svg>
+                                    </span></a>
+                                    <%}else{ %>
+                                      <p class="text-sm leading-6 text-gray-900"><span><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                                      </svg>
+                                      </span></p>
+                                      <% } %>
+                                    </div>
+                                  </li>  
+                            <%}%>
+                        </ul>
+                    <% } %>
+				</div>
+			</div>
+		</div>
+	</div>
+
 </body>
 </html>

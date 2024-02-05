@@ -8,16 +8,48 @@
 </head>
 <body>
     <%- include('header.ejs') %>
-    <h2>Pages</h2>
-    <% if(pages.length==0){%>
-    <p>There are no pages available. Create One?</p>
-    <%} else{ %>
-    <ul>
-        <% for(var i=0;i< pages.length;i++){ %>
-            <li><%- pages[i].title %></li>    
-        <%}%>
-    </ul>
-    <% } %>
-    <a href="addPage">Create a new page</a>
+    <h2 class="font-bold text-center text-3xl text-slate-700 font-display px-3">
+        pages
+    </h2>
+    <div class="bg-white p-8 rounded-md w-full">
+        <div class=" flex items-center justify-between pb-6">
+            <div>
+                <h2 class="text-gray-600 font-semibold"><%= chapter.title %></h2>
+                <span class="text-xs">pages</span>
+            </div>
+            <div class="flex items-center justify-between">
+                    <div class="lg:ml-40 ml-10 space-x-8">
+                        <% if(user.id == course.userId){%>
+                        <a href="addPage" class="bg-indigo-600 px-4 py-2 rounded-md text-white font-semibold tracking-wide cursor-pointer">Create</a>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
+                    <div class="inline-block min-w-full shadow rounded-lg overflow-hidden">
+                        <% if(pages.length==0){%>
+                            <h2 class="font-bold text-center text-2xl text-slate-500 font-display p-10">
+                                No pages Available..!
+                            </h2>
+                            <%} else{ %>
+                                <ul role="list" class="divide-y divide-gray-100">
+                                <% for(var i=0;i< pages.length;i++){ %>
+                                    <a href="pages/<%= pages[i].id %>">
+                                        <li class="flex justify-between gap-x-6 py-5">
+                                            <div class="flex min-w-0 gap-x-4">
+                                                <div class="min-w-0 flex-auto px-5">
+                                                    <p class="text-sm font-semibold leading-6 text-gray-900"><%= pages[i].content %></p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </a>
+                                <%}%>
+                            </ul>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
 </body>
 </html>

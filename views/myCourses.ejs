@@ -9,23 +9,19 @@
 </head>
 <body>
     <%- include('header.ejs') %>
-    <%if(user){%>
-      <%- include('dashboard.ejs') %>
-    <%}%>
     <div class="relative flex min-h-screen flex-col justify-center overflow-hidden bg-slate-100 py-4 sm:py-12">
         <div class="min-h-28 ">
             <div class="max-w-screen-lg mx-auto py-4">
                 <h2 class="font-bold text-center text-4xl text-slate-700 font-display">
                     <%if(courses.length==0){%>
                       No <%}%>
-                      Courses Available
+                      My Courses
                 </h2>
                 <div class="flex flex-wrap justify-center gap-6 mt-20">
                     <% for(var i=0; i < courses.length; i++){ %>
                     <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/4 mb-8">
                         <div class="bg-white shadow rounded-lg overflow-hidden">
                             <div class="p-6">
-                                <span class="block text-slate-400 font-semibold text-sm">Author : <%= users[i] %></span>
                                 <h3 class="mt-3 font-bold text-lg pb-4 border-b border-slate-300">
                                     <a href="https://play.tailwindcss.com/TGny89rOkl?layout=horizontal">
                                         <%= courses[i].title %>
@@ -44,7 +40,7 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="text-sky-400 w-4 h-4">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                                         </svg>
-                                        <a href="enroll/<%= courses[i].id %>">Enroll</a>
+                                        <a href="enroll/<%= courses[i].id %>">Unenroll</a>
                                     </span>
                                 </div>
                             </div>
