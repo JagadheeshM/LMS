@@ -17,8 +17,8 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
-    static addChapter({ title, courseId }) {
-      return this.create({ title, courseId });
+    static addChapter({ title, courseId, description }) {
+      return this.create({ title, courseId, description });
     }
 
     static getChapters(id) {
@@ -32,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
   Chapter.init(
     {
       title: DataTypes.STRING,
+      description: DataTypes.STRING,
     },
     {
       sequelize,

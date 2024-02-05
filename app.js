@@ -127,6 +127,7 @@ app.post(
       const chapter = await Chapter.addChapter({
         title: request.body.title,
         courseId: request.params.id,
+        description: request.body.description,
       });
       return response.redirect(`/courses/${request.params.id}/chapters`);
     } catch (err) {
@@ -182,6 +183,7 @@ app.post(
       const page = await Page.addPage({
         content: request.body.content,
         chapterId: request.params.chid,
+        title: request.body.title,
       });
       return response.redirect(
         `/courses/${request.params.coId}/chapters/${request.params.chid}/pages`,
@@ -264,6 +266,32 @@ app.put(
     }
   },
 );
+
+app.get(
+  "/mycourses",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const courses = await Course.findAll({
+      where: {
+        userId: request.user.id,
+      },
+    });
+    const enrolled = [];
+    for (var i in courses) {
+      let count = await Enroll.count({
+        where: {
+          courseId: courses[i].dataValues.id,
+        },
+      });
+      enrolled.push(count);
+    }
+    response.render("coursesMine", { courses, user: request.user, enrolled });
+  },
+);
+
+app.get("/delete/:id", async (request, response) => {
+  response.redirect("/mycourses");
+});
 
 app.get(
   "/addCourse",

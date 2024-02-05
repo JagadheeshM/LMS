@@ -13,8 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
 
-    static addPage({ content, chapterId }) {
-      return this.create({ content, chapterId, completed: false });
+    static addPage({ content, chapterId, title }) {
+      return this.create({ content, chapterId, completed: false, title });
     }
 
     static getPages(id) {
@@ -33,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       content: DataTypes.TEXT,
       completed: DataTypes.BOOLEAN,
+      title: DataTypes.STRING,
     },
     {
       sequelize,
