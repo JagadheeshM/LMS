@@ -8,19 +8,19 @@
 </head>
 <body>
     <%- include('header.ejs') %>
+    <div class=" m-3 border-2 p-4">
     <h2 class="font-bold text-center text-3xl text-slate-700 font-display px-3">
-        pages
+        <%= chapter.title %>
     </h2>
     <div class="bg-white p-8 rounded-md w-full">
         <div class=" flex items-center justify-between pb-6">
-            <div>
-                <h2 class="text-gray-600 font-semibold"><%= chapter.title %></h2>
-                <span class="text-xs">pages</span>
-            </div>
-            <div class="flex items-center justify-between">
+            <div class="flex w-full items-center justify-between">
+                <div class="px-6">
+                    <h2 class="text-gray-600 font-bold text-xl px-3">Pages</h2>
+                </div>
                     <div class="lg:ml-40 ml-10 space-x-8">
                         <% if(user.id == course.userId){%>
-                        <a href="addPage" class="bg-indigo-600 px-4 py-2 rounded-md text-white font-semibold tracking-wide cursor-pointer">Create</a>
+                        <a href="addPage" class="bg-indigo-600 px-4 py-2 mr-3 rounded-md text-white font-semibold tracking-wide cursor-pointer">Create</a>
                         <% } %>
                     </div>
                 </div>
@@ -39,7 +39,7 @@
                                         <li class="flex justify-between gap-x-6 py-5">
                                             <div class="flex min-w-0 gap-x-4">
                                                 <div class="min-w-0 flex-auto px-5">
-                                                    <p class="text-sm font-semibold leading-6 text-gray-900"><%= pages[i].title %></p>
+                                                    <p class="text-lg font-semibold leading-2 text-gray-900"><%= pages[i].title %></p>
                                                 </div>
                                             </div>
                                         </li>
@@ -51,5 +51,6 @@
                 </div>
             </div>
         </div>
+    </div>
 </body>
 </html>

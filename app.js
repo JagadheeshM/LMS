@@ -151,12 +151,32 @@ app.get(
             courseId: request.params.id,
           },
         })) != null;
+      let count = 0;
+      let totalCount = 0;
+      for (const i in chapters) {
+        const pages = await Page.findAll({
+          where: {
+            chapterId: chapters[i].dataValues.id,
+          },
+        });
+        totalCount += pages.length;
+        for (const j in pages) {
+          count += await Complete.count({
+            where: {
+              pageId: pages[i].dataValues.id,
+              userId: request.user.id,
+            },
+          });
+        }
+      }
       return response.render("chapters", {
         chapters,
         id: request.params.id,
         user: request.user,
         course,
         enrolled: enrolled,
+        count,
+        totalCount,
       });
     } catch (err) {
       console.log(err);
@@ -289,6 +309,10 @@ app.get(
   },
 );
 
+app.get("/reports", (request, response) => {
+  response.send("reports");
+});
+
 app.get("/delete/:id", async (request, response) => {
   response.redirect("/mycourses");
 });
@@ -353,7 +377,7 @@ app.get(
           userId: request.user.id,
           courseId: request.params.id,
         });
-        response.json(enroll);
+        response.redirect(`/myEnrolledCourses/${request.user.id}`);
       } catch (err) {
         console.log(err);
       }
