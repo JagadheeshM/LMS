@@ -9,6 +9,9 @@ app.use(bodyParser.json());
 var csrf = require("csurf");
 var cookieParser = require("cookie-parser");
 
+//for flash messages
+const flash = require("connect-flash");
+
 //authentication purpose
 
 const { Op } = require("sequelize");
@@ -30,6 +33,8 @@ app.use(cookieParser("silent-my-secret-key"));
 app.use(csrf({ cookie: true }));
 
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use(flash());
 
 const { Course, Chapter, Page, User, Enroll, Complete } = require("./models");
 
@@ -55,19 +60,28 @@ passport.use(
       usernameField: "email",
       passwordField: "password",
     },
-    (username, password, done) => {
-      User.findOne({ where: { email: username } })
-        .then(async (user) => {
-          const passRes = await bcrypt.compare(password, user.password);
-          if (passRes) {
-            return done(null, user);
-          } else {
-            return done("Invalid password");
-          }
-        })
-        .catch((error) => {
-          return error;
-        });
+    async (username, password, done) => {
+      const user = await User.findOne({ where: { email: username } });
+      if (user) {
+        try {
+          const myFunction = async (user) => {
+            const passRes = await bcrypt.compare(
+              password,
+              user.dataValues.password,
+            );
+            if (passRes) {
+              return done(null, user);
+            } else {
+              return done(null, false, { message: "Invalid password" });
+            }
+          };
+          myFunction(user);
+        } catch (err) {
+          return err;
+        }
+      } else {
+        return done(null, false, { message: "Invalid email" });
+      }
     },
   ),
 );
@@ -85,6 +99,11 @@ passport.deserializeUser((id, done) => {
     .catch((error) => {
       done(error, null);
     });
+});
+
+app.use((req, res, next) => {
+  res.locals.messages = req.flash();
+  next();
 });
 
 app.get(
@@ -461,8 +480,12 @@ app.get("/login", (request, response) => {
 
 app.post(
   "/session",
-  passport.authenticate("local", { failureRedirect: "/login" }),
+  passport.authenticate("local", {
+    failureRedirect: "/login",
+    failureFlash: true,
+  }),
   (request, response) => {
+    request.flash("login success");
     response.redirect("/");
   },
 );
