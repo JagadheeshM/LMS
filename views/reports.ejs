@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <%- include('header.ejs') %>
+    <div class=" m-3 border-2 p-4">
+    <h2 class="font-bold text-center text-3xl text-slate-700 font-display px-3">
+       My Reports
+    </h2>
+    <div class="bg-white p-8 rounded-md w-full">
+      <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">S.No</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">Name</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">Email</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">Course</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">Enrolled</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">contact</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% for(var i=0;i< reports.length ;i++){ %>
+                  <tr class="border-b border-gray-200 dark:border-gray-700">
+                    <td class="px-6 py-4"><%=(i+1)%></td>
+                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"><%=reports[i].firstName %> <%=reports[i].lastName %></th>
+                    <td class="px-6 py-4"><%=reports[i].email%></td>
+                    <td class="px-6 py-4"><%=reports[i].course%></td>
+                    <td class="px-6 py-4"><%=reports[i].enrollDate %></td>
+                    <td class="px-6 py-4 p-auto">
+                      <a href="mailto:<%=reports[i].email%>"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
+                        </svg></a>
+                    </td>
+                  </tr>
+                  <% } %>
+                </tbody>
+              </table>
+        </div>
+            
+        </div>
+    </div>
+</body>
+</html>

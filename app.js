@@ -309,9 +309,45 @@ app.get(
   },
 );
 
-app.get("/reports", (request, response) => {
-  response.send("reports");
-});
+app.get(
+  "/reports",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      const courses = await Course.findAll({
+        where: {
+          userId: request.user.id,
+        },
+      });
+      const reports = [];
+      for (const i in courses) {
+        const users = await Enroll.findAll({
+          where: {
+            courseId: courses[i].dataValues.id,
+          },
+        });
+
+        for (const j in users) {
+          const course = await Course.findByPk(courses[i].dataValues.id);
+          const oneUser = await User.findByPk(users[j].dataValues.userId);
+          let report = {
+            firstName: oneUser.dataValues.firstName,
+            lastName: oneUser.dataValues.lastName,
+            email: oneUser.dataValues.email,
+            enrollDate: oneUser.dataValues.createdAt
+              .toString()
+              .substring(0, 24),
+            course: course.dataValues.title,
+          };
+          reports.push(report);
+        }
+      }
+      response.render("reports", { reports, user: request.user });
+    } catch (err) {
+      console.log(err);
+    }
+  },
+);
 
 app.get("/delete/:id", async (request, response) => {
   response.redirect("/mycourses");
