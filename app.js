@@ -14,8 +14,13 @@ const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
 const LocalStrategy = require("passport-local");
 
+//to hash the password
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
+
+//for reset password
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
 app.use(
   session({
@@ -463,6 +468,73 @@ app.post("/users", async (request, response) => {
     }
     response.redirect("/");
   });
+});
+
+//handling forgot password
+const generateResetToken = () => {
+  return crypto.randomBytes(20).toString("hex");
+};
+
+const sendResetEmail = async (email, token) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "mjagadheesh2016@gmail.com",
+      pass: "vnga hkwj icxs sdcl",
+    },
+  });
+
+  const mailOptions = {
+    from: "mjagadheesh2016@gmail.com",
+    to: email,
+    subject: "Password Reset",
+    text: `Click the following link to reset your password: http://localhost:3000/reset/${token}`,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+app.get("/forgotPassword", (request, response) => {
+  response.render("resetPassword");
+});
+
+app.post("/forgotPassword", async (request, response) => {
+  const email = request.body.email;
+  const user = await User.findOne({
+    where: {
+      email: email,
+    },
+  });
+  if (user) {
+    const resetToken = generateResetToken();
+    user.resetToken = resetToken;
+    await user.save();
+
+    await sendResetEmail(email, resetToken);
+    response.send("check your mail for password reset");
+  } else {
+    response.send("Email not found..!");
+  }
+});
+
+app.get("/reset/:token", (request, response) => {
+  const token = request.params.token;
+  response.render("resetPasswordForm", { token });
+});
+
+app.post("/reset/:token", async (request, response) => {
+  const token = request.params.token;
+  const newPassword = request.body.newPassword;
+  const confirmPassword = request.body.confirmPassword;
+  if (newPassword == confirmPassword) {
+    const user = await User.findOne({ where: { resetToken: token } });
+    user.password = await bcrypt.hash(request.body.newPassword, saltRounds);
+    user.resetToken = null;
+    await user.save();
+    response.redirect("/login");
+  } else {
+    response.send("passwords doesn't match");
+  }
 });
 
 module.exports = app;
