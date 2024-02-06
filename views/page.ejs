@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>">
     <title>Document</title>
     <script>
+      var token = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
         async function markAsComplete(id){
             console.log("function called",id)
             fetch(`/courses/${id}/markAsComplete`,{
                 method:"put",
-                headers:{"Content-type":"application/json"}
+                headers:{"Content-type":"application/json"},
+                body:JSON.stringify({
+                  "_csrf":token
+                })
             })
             .then((res)=>{
                 if(res.ok){
@@ -23,7 +28,7 @@
 </head>
 <body class="h-full">
         <%- include('header.ejs') %>
-        <div class="flex min-h-full flex-col justify-center m-8 border-2 px-6 py-10 lg:px-8">
+        <div class="flex min-h-full flex-col justify-center m-8 border-2 px-6 py-4 lg:px-8">
             <div class="sm:mx-auto sm:w-full sm:max-w-sm">
               <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900"><%= page.title %></h2>
             </div>
@@ -32,7 +37,7 @@
               <form class="space-y-6" action="/session" method="POST">
                 <div>
                   <div class="mt-2">
-                    <textarea rows-5 id="content" name="content" type="content" disabled class="block w-full h-fit rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"><%= page.content %></textarea>
+                    <textarea id="content" name="content" type="content" disabled class="block w-full h-64 rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6"><%= page.content %></textarea>
                   </div>
                 </div>
                 <% if(!completed){ %>

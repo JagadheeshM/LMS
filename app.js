@@ -5,6 +5,10 @@ const bodyParser = require("body-parser");
 const path = require("path");
 app.use(bodyParser.json());
 
+//to secure from csrf
+var csrf = require("csurf");
+var cookieParser = require("cookie-parser");
+
 //authentication purpose
 
 const { Op } = require("sequelize");
@@ -17,6 +21,17 @@ const LocalStrategy = require("passport-local");
 //to hash the password
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
+
+//set EJS as view engine
+
+app.set("view engine", "ejs");
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser("silent-my-secret-key"));
+app.use(csrf({ cookie: true }));
+
+app.use(express.static(path.join(__dirname, "public")));
+
+const { Course, Chapter, Page, User, Enroll, Complete } = require("./models");
 
 //for reset password
 const nodemailer = require("nodemailer");
@@ -71,14 +86,6 @@ passport.deserializeUser((id, done) => {
       done(error, null);
     });
 });
-
-//set EJS as view engine
-
-app.set("view engine", "ejs");
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
-
-const { Course, Chapter, Page, User, Enroll, Complete } = require("./models");
 
 app.get(
   "/",
@@ -196,6 +203,7 @@ app.get(
     response.render("addChapter", {
       id: request.params.id,
       user: request.user,
+      csrfToken: request.csrfToken(),
     });
   },
 );
@@ -236,7 +244,13 @@ app.get(
           pageId: request.params.id,
         },
       })) != null;
-    response.render("page", { page, user: request.user, completed });
+    console.log("completed:", completed);
+    response.render("page", {
+      page,
+      user: request.user,
+      completed,
+      csrfToken: request.csrfToken(),
+    });
   },
 );
 
@@ -259,7 +273,11 @@ app.get(
   "/courses/:coId/chapters/:id/addPage",
   connectEnsureLogin.ensureLoggedIn(),
   (request, response) => {
-    response.render("addPage", { id: request.params.id, user: request.user });
+    response.render("addPage", {
+      id: request.params.id,
+      user: request.user,
+      csrfToken: request.csrfToken(),
+    });
   },
 );
 
@@ -284,7 +302,7 @@ app.put(
           userId: request.user.id,
           pageId: request.params.id,
         });
-        resposne.render("page", { page, user: request.user });
+        response.render("redirect", { id: request.params.id });
       } catch (err) {
         console.log(err);
       }
@@ -362,7 +380,10 @@ app.get(
   "/addCourse",
   connectEnsureLogin.ensureLoggedIn(),
   (request, response) => {
-    response.render("addCourse", { user: request.user });
+    response.render("addCourse", {
+      user: request.user,
+      csrfToken: request.csrfToken(),
+    });
   },
 );
 
@@ -426,12 +447,16 @@ app.get(
   },
 );
 
+app.get("/courses/:id/enroll", (request, response) => {
+  response.redirect(`/enroll/${request.params.id}`);
+});
+
 app.get("/signup", (request, response) => {
-  response.render("signup");
+  response.render("signup", { csrfToken: request.csrfToken() });
 });
 
 app.get("/login", (request, response) => {
-  response.render("login");
+  response.render("login", { csrfToken: request.csrfToken() });
 });
 
 app.post(
@@ -488,7 +513,7 @@ const sendResetEmail = async (email, token) => {
     from: "mjagadheesh2016@gmail.com",
     to: email,
     subject: "Password Reset",
-    text: `Click the following link to reset your password: http://localhost:3000/reset/${token}`,
+    text: `Click the following link to reset your password: https://jag-lms.onrender.com/reset/${token}`,
   };
 
   await transporter.sendMail(mailOptions);

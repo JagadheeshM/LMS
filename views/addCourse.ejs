@@ -9,6 +9,7 @@
 <body>
     <%- include('header.ejs') %>
     <form action="/courses" method="post" class="m-4 border-4 p-6 rounded">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <div class="space-y-12 ">
         <div class="border-b border-gray-900/10 pb-12">
             <h2 class="text-base font-semibold text-xl leading-7 text-gray-900">Create New Course</h2>
