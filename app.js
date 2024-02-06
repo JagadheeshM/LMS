@@ -300,7 +300,7 @@ app.get(
   },
 );
 
-app.put(
+app.post(
   "/courses/:id/markAsComplete",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
@@ -321,7 +321,7 @@ app.put(
           userId: request.user.id,
           pageId: request.params.id,
         });
-        response.render("redirect", { id: request.params.id });
+        response.redirect(`/courses/chapters/pages/${request.params.id}`);
       } catch (err) {
         console.log(err);
       }

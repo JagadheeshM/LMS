@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      window.addEventListener( "pageshow", function ( event ) {
+          var historyTraversal = event.persisted || 
+                                 ( typeof window.performance != "undefined" && 
+                                      window.performance.navigation.type === 2 );
+          if ( historyTraversal ) {
+            window.location.reload();
+          }
+        });
+  </script>
 </head>
 <body>
     <%- include('header.ejs') %>
