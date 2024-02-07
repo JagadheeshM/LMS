@@ -208,6 +208,7 @@ app.get(
         enrolled: enrolled,
         count,
         totalCount,
+        csrfToken: request.csrfToken(),
       });
     } catch (err) {
       console.log(err);
@@ -277,6 +278,32 @@ app.get(
   },
 );
 
+app.delete(
+  "/courses/chapters/pages/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const page = await Page.findByPk(request.params.id);
+    const id = page.dataValues.chapterId;
+    const chapter = await Chapter.findByPk(id);
+    const coId = chapter.dataValues.courseId;
+    await Page.destroy({ where: { id: request.params.id } });
+    return response.redirect(`/courses/${coId}/chapters/${id}/pages`);
+  },
+);
+
+app.delete(
+  "/courses/chapters/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const id = request.params.id;
+    await Page.destroy({ where: { chapterId: id } });
+    const chapter = await Chapter.findByPk(id);
+    await Chapter.destroy({ where: { id: id } });
+    const coid = chapter.dataValues.courseId;
+    return response.redirect(`/courses/${coid}/chapters`);
+  },
+);
+
 app.get(
   "/courses/:coId/chapters/:id/pages",
   connectEnsureLogin.ensureLoggedIn(),
@@ -285,7 +312,13 @@ app.get(
       const pages = await Page.getPages(request.params.id);
       const chapter = await Chapter.findByPk(request.params.id);
       const course = await Course.findByPk(chapter.dataValues.courseId);
-      response.render("pages", { pages, user: request.user, chapter, course });
+      response.render("pages", {
+        pages,
+        user: request.user,
+        chapter,
+        course,
+        csrfToken: request.csrfToken(),
+      });
     } catch (err) {
       console.log(err);
     }
