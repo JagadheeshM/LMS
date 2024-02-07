@@ -247,9 +247,13 @@ app.post(
   },
 );
 
-app.get("/courses/:coId/chapters/:chId/pages/:id", (request, response) => {
-  response.redirect(`/courses/chapters/pages/${request.params.id}`);
-});
+app.get(
+  "/courses/:coId/chapters/:chId/pages/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  (request, response) => {
+    response.redirect(`/courses/chapters/pages/${request.params.id}`);
+  },
+);
 
 app.get(
   "/courses/chapters/pages/:id",
@@ -462,20 +466,28 @@ app.get(
   },
 );
 
-app.delete("/myEnrolledCourses/unenroll/:id", async (request, response) => {
-  try {
-    await Enroll.destroy({
-      where: { userId: request.user.id, courseId: request.params.id },
-    });
-    response.redirect(`/myEnrolledCourses/${request.user.id}`);
-  } catch (err) {
-    console.log(err);
-  }
-});
+app.delete(
+  "/myEnrolledCourses/unenroll/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      await Enroll.destroy({
+        where: { userId: request.user.id, courseId: request.params.id },
+      });
+      response.redirect(`/myEnrolledCourses/${request.user.id}`);
+    } catch (err) {
+      console.log(err);
+    }
+  },
+);
 
-app.get("/myEnrolledCourses/courses/:id/chapters", (request, response) => {
-  response.redirect(`/courses/${request.params.id}/chapters`);
-});
+app.get(
+  "/myEnrolledCourses/courses/:id/chapters",
+  connectEnsureLogin.ensureLoggedIn(),
+  (request, response) => {
+    response.redirect(`/courses/${request.params.id}/chapters`);
+  },
+);
 
 app.get(
   "/enroll/:id",
@@ -504,9 +516,13 @@ app.get(
   },
 );
 
-app.get("/courses/:id/enroll", (request, response) => {
-  response.redirect(`/enroll/${request.params.id}`);
-});
+app.get(
+  "/courses/:id/enroll",
+  connectEnsureLogin.ensureLoggedIn(),
+  (request, response) => {
+    response.redirect(`/enroll/${request.params.id}`);
+  },
+);
 
 app.get("/signup", (request, response) => {
   response.render("signup", { csrfToken: request.csrfToken() });
@@ -623,7 +639,10 @@ app.post("/forgotPassword", async (request, response) => {
 
 app.get("/reset/:token", (request, response) => {
   const token = request.params.token;
-  response.render("resetPasswordForm", { token });
+  response.render("resetPasswordForm", {
+    token,
+    csrfToken: request.csrfToken(),
+  });
 });
 
 app.post("/reset/:token", async (request, response) => {
