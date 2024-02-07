@@ -428,12 +428,27 @@ app.get(
           },
         },
       });
-      response.render("myCourses", { courses, user: request.user });
+      response.render("myCourses", {
+        courses,
+        user: request.user,
+        csrfToken: request.csrfToken(),
+      });
     } catch (err) {
       console.log(err);
     }
   },
 );
+
+app.delete("/myEnrolledCourses/unenroll/:id", async (request, response) => {
+  try {
+    await Enroll.destroy({
+      where: { userId: request.user.id, courseId: request.params.id },
+    });
+    response.redirect(`/myEnrolledCourses/${request.user.id}`);
+  } catch (err) {
+    console.log(err);
+  }
+});
 
 app.get("/myEnrolledCourses/courses/:id/chapters", (request, response) => {
   response.redirect(`/courses/${request.params.id}/chapters`);
@@ -583,6 +598,10 @@ app.post("/reset/:token", async (request, response) => {
   } else {
     response.send("passwords doesn't match");
   }
+});
+
+app.use((req, res, next) => {
+  res.status(404).render("404", { user: req.user });
 });
 
 module.exports = app;
