@@ -347,7 +347,12 @@ app.get(
       });
       enrolled.push(count);
     }
-    response.render("coursesMine", { courses, user: request.user, enrolled });
+    response.render("coursesMine", {
+      courses,
+      user: request.user,
+      enrolled,
+      csrfToken: request.csrfToken(),
+    });
   },
 );
 
@@ -384,16 +389,34 @@ app.get(
           reports.push(report);
         }
       }
-      response.render("reports", { reports, user: request.user });
+      response.render("reports", {
+        reports,
+        user: request.user,
+        csrfToken: request.csrfToken(),
+      });
     } catch (err) {
       console.log(err);
     }
   },
 );
 
-app.get("/delete/:id", async (request, response) => {
-  response.redirect("/mycourses");
-});
+app.delete(
+  "/mycourses/remove/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const courseId = request.params.id;
+    const userId = request.user.id;
+    const chapters = await Chapter.findAll({ where: { courseId: courseId } });
+    for (const chapter of chapters) {
+      await Page.destroy({ where: { chapterId: chapter.id } });
+    }
+    await Chapter.destroy({ where: { courseId: courseId } });
+    await Course.destroy({ where: { id: courseId } });
+    await Enroll.destroy({ where: { courseId: courseId } });
+
+    return response.redirect(`mycourses/${courseId}`);
+  },
+);
 
 app.get(
   "/addCourse",
@@ -500,7 +523,6 @@ app.post(
     failureFlash: true,
   }),
   (request, response) => {
-    request.flash("login success");
     response.redirect("/");
   },
 );
@@ -517,11 +539,30 @@ app.get("/signout", (request, response, next) => {
 app.post("/users", async (request, response) => {
   //Hash the password
   const hashedPass = await bcrypt.hash(request.body.password, saltRounds);
-
+  const uemail = request.body.email;
+  const ufirstName = request.body.firstName;
+  const ulastName = request.body.lastName;
+  const upass = request.body.password;
+  if (ufirstName.trim().length < 4) {
+    request.flash("error", "* First Name too short");
+    return response.redirect("/signup");
+  } else if (ulastName.trim().length < 4) {
+    request.flash("error", "* Last Name too short");
+    return response.redirect("/signup");
+  } else if (upass.trim().length < 6) {
+    request.flash("error", "* Password should have min length 6");
+    return response.redirect("/signup");
+  } else if (await User.findOne({ where: { email: uemail } })) {
+    request.flash("error", "Email already registered");
+    return response.redirect("/signup");
+  } else if (request.body.password != request.body.cpassword) {
+    request.flash("error", "* Passwords doesn't match");
+    return response.redirect("/signup");
+  }
   const user = await User.create({
-    firstName: request.body.firstName,
-    lastName: request.body.lastName,
-    email: request.body.email,
+    firstName: ufirstName,
+    lastName: ulastName,
+    email: uemail,
     password: hashedPass,
     type: request.body.type,
   });

@@ -2,7 +2,7 @@
 const request = require("supertest");
 var cheerio = require("cheerio");
 const db = require("../models/index");
-const { Complete, Enroll } = require("../models");
+const { Complete, Enroll, Course } = require("../models");
 const app = require("../app");
 
 let server, agent;
@@ -27,10 +27,11 @@ describe("First test suite", () => {
     const res = await agent.get("/signup");
     const csrfToken = extractCsrfToken(res);
     const response = await agent.post("/users").send({
-      firstName: "abc",
-      lastName: "xyz",
-      email: "abc@gmail.com",
-      password: "1234",
+      firstName: "abcde",
+      lastName: "vwxyz",
+      email: "abcd@gmail.com",
+      password: "12345678",
+      cpassword: "12345678",
       type: "educator",
       _csrf: csrfToken,
     });
@@ -42,6 +43,11 @@ describe("First test suite", () => {
     const csrfToken = extractCsrfToken(res);
     res = await agent.post("/courses").send({
       title: "Java",
+      userId: 1,
+      _csrf: csrfToken,
+    });
+    res = await agent.post("/courses").send({
+      title: "Js",
       userId: 1,
       _csrf: csrfToken,
     });
@@ -81,10 +87,11 @@ describe("First test suite", () => {
     let res = await agent.get("/signup");
     const csrfToken = extractCsrfToken(res);
     await agent.post("/users").send({
-      firstName: "user",
-      lastName: "b",
+      firstName: "userb",
+      lastName: "bcdef",
       email: "buser@gmail.com",
-      password: "1234",
+      password: "12345678",
+      cpassword: "12345678",
       type: "learner",
       _csrf: csrfToken,
     });
