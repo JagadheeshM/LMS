@@ -599,7 +599,7 @@ const sendResetEmail = async (email, token) => {
 };
 
 app.get("/forgotPassword", (request, response) => {
-  response.render("resetPassword");
+  response.render("resetPassword", { csrfToken: request.csrfToken() });
 });
 
 app.post("/forgotPassword", async (request, response) => {
